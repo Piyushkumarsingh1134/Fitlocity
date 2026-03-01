@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: auth-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/auth_db
+    username: postgres
+    password: Piyu@1134
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+server:
+  port: 4001
+
+jwt:
+  secret: supersecretkey
+  expiry: 3600000
