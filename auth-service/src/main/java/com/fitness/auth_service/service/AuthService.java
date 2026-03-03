@@ -1,7 +1,5 @@
 package com.fitness.auth_service.service;
 
-
-
 import com.fitness.auth_service.model.*;
 import com.fitness.auth_service.repository.*;
 import com.fitness.auth_service.security.JwtUtil;
@@ -10,11 +8,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AuthService {
 
     private final UserRepository userRepository;
@@ -24,14 +24,15 @@ public class AuthService {
     private final TokenUtil tokenUtil;
 
     // 1️⃣ Request OTP
-    public void requestOtp(String phone) {
+    public void requestOtp(String phone, Role role) {
 
-        String otp = String.valueOf((int)(Math.random() * 900000) + 100000);
+        String otp = String.valueOf((int) (Math.random() * 900000) + 100000);
         String hash = BCrypt.hashpw(otp, BCrypt.gensalt());
 
         OtpVerification record = new OtpVerification();
         record.setPhone(phone);
         record.setOtpHash(hash);
+        record.setRole(role);
         record.setExpiresAt(LocalDateTime.now().plusMinutes(5));
 
         otpRepository.save(record);
@@ -60,8 +61,15 @@ public class AuthService {
                 .orElseGet(() -> {
                     User u = new User();
                     u.setPhone(phone);
+                    u.setRole(record.getRole()); // Set role from OTP record for new user
                     return userRepository.save(u);
                 });
+
+        // Optionally update existing user's role if it's different
+        if (record.getRole() != null && user.getRole() != record.getRole()) {
+            user.setRole(record.getRole());
+            userRepository.save(user);
+        }
 
         // Generate tokens
         String accessToken = jwtUtil.generateAccessToken(user.getId(), user.getRole().name());
@@ -79,18 +87,14 @@ public class AuthService {
 
         return Map.of(
                 "accessToken", accessToken,
-                "refreshToken", refreshToken
-        );
+                "refreshToken", refreshToken);
     }
 
     // 3️⃣ Refresh Token Endpoint Logic
     public Map<String, String> refreshToken(String refreshToken) {
 
         Session session = sessionRepository
-                .findAll()
-                .stream()
-                .filter(s -> s.getRefreshToken().equals(refreshToken))
-                .findFirst()
+                .findByRefreshToken(refreshToken)
                 .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
 
         if (session.getExpiresAt().isBefore(LocalDateTime.now()))

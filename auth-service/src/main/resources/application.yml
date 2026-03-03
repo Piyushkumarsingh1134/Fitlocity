@@ -16,5 +16,5 @@ server:
   port: 4001
 
 jwt:
-  secret: supersecretkey
+  secret: this_is_a_very_long_secret_key_used_for_jwt_signing_which_must_be_at_least_256_bits_long
   expiry: 3600000
