@@ -6,6 +6,8 @@ import com.fitlocity.gym.service.GymService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -17,16 +19,21 @@ public class GymController {
 
     private final GymService gymService;
 
-    // -------- CREATE GYM --------
+    // -------- CREATE GYM (OWNER ONLY) --------
 
-    @PostMapping("/{ownerId}")
-    public GymResponse createGym(@PathVariable UUID ownerId,
-                                 @Valid @RequestBody CreateGymRequest request) {
+    @PreAuthorize("hasRole('OWNER')")
+    @PostMapping
+    public GymResponse createGym(@Valid @RequestBody CreateGymRequest request) {
 
-        return gymService.createGym(ownerId, request);
+        UUID userId = (UUID) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        return gymService.createGym(userId, request);
     }
 
-    // -------- GET ALL GYMS (PAGINATED) --------
+    // -------- GET ALL GYMS --------
 
     @GetMapping
     public Page<GymResponse> getAllGyms(
@@ -40,7 +47,7 @@ public class GymController {
     // -------- GET GYM BY ID --------
 
     @GetMapping("/{id}")
-    public GymResponse getGym(@PathVariable UUID id) {
+    public GymResponse getGymById(@PathVariable UUID id) {
 
         return gymService.getGymById(id);
     }
