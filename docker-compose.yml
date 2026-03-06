@@ -1,0 +1,37 @@
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: fitlocity-postgres
+    environment:
+      POSTGRES_USER: ajaydangoriyatharu
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: fitlocity_gym
+    ports:
+      - "5432:5432"
+    networks:
+      - fitlocity-network
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    ports:
+      - "4001:4001"
+    depends_on:
+      - postgres
+    networks:
+      - fitlocity-network
+
+  gym-service:
+    build: ./GymService
+    container_name: gym-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - postgres
+    networks:
+      - fitlocity-network
+
+networks:
+  fitlocity-network:
+    driver: bridge
