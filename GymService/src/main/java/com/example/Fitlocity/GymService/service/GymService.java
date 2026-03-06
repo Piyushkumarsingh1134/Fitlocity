@@ -11,6 +11,7 @@ import com.fitlocity.gym.repository.GymRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,12 +24,21 @@ public class GymService {
     private final GymRepository gymRepository;
     private final GymOwnerRepository gymOwnerRepository;
 
-    // ---------------- CREATE GYM ----------------
+    @Transactional
+    public GymResponse createGym(UUID userId, CreateGymRequest request) {
 
-    public GymResponse createGym(UUID ownerId, CreateGymRequest request) {
-
-        GymOwner owner = gymOwnerRepository.findById(ownerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+        // Auto-create owner if not exists
+        GymOwner owner = gymOwnerRepository.findByUserId(userId)
+                .orElseGet(() -> {
+                    GymOwner newOwner = new GymOwner();
+                    newOwner.setId(UUID.randomUUID());
+                    newOwner.setUserId(userId);
+                    newOwner.setOwnerPhone(request.getContactPhone());
+                    newOwner.setOwnerEmail(request.getContactEmail());
+                    newOwner.setCreatedAt(LocalDateTime.now());
+                    newOwner.setUpdatedAt(LocalDateTime.now());
+                    return gymOwnerRepository.save(newOwner);
+                });
 
         if (gymRepository.existsBySlug(request.getSlug())) {
             throw new BadRequestException("Slug already exists");
@@ -56,8 +66,6 @@ public class GymService {
         return mapToResponse(saved);
     }
 
-    // ---------------- GET ALL (PAGINATED) ----------------
-
     public Page<GymResponse> getAllGyms(int page, int size, String sortBy) {
 
         List<String> allowedSortFields = List.of("createdAt", "rating", "name");
@@ -77,8 +85,6 @@ public class GymService {
         return gymPage.map(this::mapToResponse);
     }
 
-    // ---------------- GET BY ID ----------------
-
     public GymResponse getGymById(UUID id) {
 
         Gym gym = gymRepository.findById(id)
@@ -86,8 +92,6 @@ public class GymService {
 
         return mapToResponse(gym);
     }
-
-    // ---------------- MAPPER ----------------
 
     private GymResponse mapToResponse(Gym gym) {
 

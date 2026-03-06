@@ -19,8 +19,6 @@ public class GymController {
 
     private final GymService gymService;
 
-    // -------- CREATE GYM (OWNER ONLY) --------
-
     @PreAuthorize("hasRole('OWNER')")
     @PostMapping
     public GymResponse createGym(@Valid @RequestBody CreateGymRequest request) {
@@ -33,8 +31,6 @@ public class GymController {
         return gymService.createGym(userId, request);
     }
 
-    // -------- GET ALL GYMS --------
-
     @GetMapping
     public Page<GymResponse> getAllGyms(
             @RequestParam(defaultValue = "0") int page,
@@ -43,8 +39,6 @@ public class GymController {
 
         return gymService.getAllGyms(page, size, sortBy);
     }
-
-    // -------- GET GYM BY ID --------
 
     @GetMapping("/{id}")
     public GymResponse getGymById(@PathVariable UUID id) {
