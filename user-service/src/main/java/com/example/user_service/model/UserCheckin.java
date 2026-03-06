@@ -16,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 
-public class UserCheckins {
+public class UserCheckin {
 
     @Id
     @UuidGenerator
@@ -32,7 +32,7 @@ public class UserCheckins {
 
     @ManyToOne
     @JoinColumn(name = "membership_id")
-    private UserMemberShip userMemberShip;
+    private UserMembership userMembership;
 
     @Column(name = "checkin_time")
     private LocalDateTime checkinTime;

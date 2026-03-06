@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Entity
 @Table(
-        name = "user_memberships",
+        name = "user_membership",
         indexes = {
                 @Index(name = "idx_membership_user", columnList = "user_id"),
                 @Index(name = "idx_membership_gym", columnList = "gym_id"),
