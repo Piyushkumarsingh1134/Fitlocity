@@ -1,7 +1,6 @@
 package com.fitness.auth_service.controller;
 
-
-
+import com.fitness.auth_service.model.Role;
 import com.fitness.auth_service.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,29 +17,31 @@ public class AuthController {
 
     @PostMapping("/request-otp")
     public ResponseEntity<?> requestOtp(@RequestBody Map<String, String> body) {
-        authService.requestOtp(body.get("phone"));
+        String phone = body.get("phone");
+        String roleStr = body.getOrDefault("role", "CUSTOMER");
+
+        Role role = Role.valueOf(roleStr.toUpperCase());
+
+        authService.requestOtp(phone, role);
         return ResponseEntity.ok("OTP sent");
     }
 
     @PostMapping("/verify-otp")
     public ResponseEntity<?> verifyOtp(@RequestBody Map<String, String> body,
-                                       @RequestHeader(value = "User-Agent", required = false) String deviceInfo,
-                                       @RequestHeader(value = "X-Forwarded-For", required = false) String ipAddress) {
+            @RequestHeader(value = "User-Agent", required = false) String deviceInfo,
+            @RequestHeader(value = "X-Forwarded-For", required = false) String ipAddress) {
 
         return ResponseEntity.ok(
                 authService.verifyOtp(
                         body.get("phone"),
                         body.get("otp"),
                         deviceInfo,
-                        ipAddress
-                )
-        );
+                        ipAddress));
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(@RequestBody Map<String, String> body) {
         return ResponseEntity.ok(
-                authService.refreshToken(body.get("refreshToken"))
-        );
+                authService.refreshToken(body.get("refreshToken")));
     }
 }

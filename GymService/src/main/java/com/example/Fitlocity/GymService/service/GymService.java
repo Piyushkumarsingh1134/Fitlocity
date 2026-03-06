@@ -3,6 +3,7 @@ package com.fitlocity.gym.service;
 import com.fitlocity.gym.domain.Gym;
 import com.fitlocity.gym.domain.GymOwner;
 import com.fitlocity.gym.dto.request.CreateGymRequest;
+import com.fitlocity.gym.dto.request.UpdateGymRequest;
 import com.fitlocity.gym.dto.response.GymResponse;
 import com.fitlocity.gym.exception.BadRequestException;
 import com.fitlocity.gym.exception.ResourceNotFoundException;
@@ -11,6 +12,7 @@ import com.fitlocity.gym.repository.GymRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,12 +25,21 @@ public class GymService {
     private final GymRepository gymRepository;
     private final GymOwnerRepository gymOwnerRepository;
 
-    // ---------------- CREATE GYM ----------------
+    @Transactional
+    public GymResponse createGym(UUID userId, CreateGymRequest request) {
 
-    public GymResponse createGym(UUID ownerId, CreateGymRequest request) {
-
-        GymOwner owner = gymOwnerRepository.findById(ownerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+        // Auto-create owner if not exists
+        GymOwner owner = gymOwnerRepository.findByUserId(userId)
+                .orElseGet(() -> {
+                    GymOwner newOwner = new GymOwner();
+                    newOwner.setId(UUID.randomUUID());
+                    newOwner.setUserId(userId);
+                    newOwner.setOwnerPhone(request.getContactPhone());
+                    newOwner.setOwnerEmail(request.getContactEmail());
+                    newOwner.setCreatedAt(LocalDateTime.now());
+                    newOwner.setUpdatedAt(LocalDateTime.now());
+                    return gymOwnerRepository.save(newOwner);
+                });
 
         if (gymRepository.existsBySlug(request.getSlug())) {
             throw new BadRequestException("Slug already exists");
@@ -56,8 +67,6 @@ public class GymService {
         return mapToResponse(saved);
     }
 
-    // ---------------- GET ALL (PAGINATED) ----------------
-
     public Page<GymResponse> getAllGyms(int page, int size, String sortBy) {
 
         List<String> allowedSortFields = List.of("createdAt", "rating", "name");
@@ -77,8 +86,6 @@ public class GymService {
         return gymPage.map(this::mapToResponse);
     }
 
-    // ---------------- GET BY ID ----------------
-
     public GymResponse getGymById(UUID id) {
 
         Gym gym = gymRepository.findById(id)
@@ -87,7 +94,33 @@ public class GymService {
         return mapToResponse(gym);
     }
 
-    // ---------------- MAPPER ----------------
+    @Transactional
+    public GymResponse updateGym(UUID id, UpdateGymRequest request) {
+        Gym gym = gymRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Gym not found"));
+
+        if (request.getName() != null) gym.setName(request.getName());
+        if (request.getDescription() != null) gym.setDescription(request.getDescription());
+        if (request.getAddress() != null) gym.setAddress(request.getAddress());
+        if (request.getGymType() != null) gym.setGymType(request.getGymType());
+        if (request.getContactPhone() != null) gym.setContactPhone(request.getContactPhone());
+        if (request.getContactEmail() != null) gym.setContactEmail(request.getContactEmail());
+        if (request.getTotalSqft() != null) gym.setTotalSqft(request.getTotalSqft());
+        if (request.getFloorsCount() != null) gym.setFloorsCount(request.getFloorsCount());
+
+        gym.setUpdatedAt(LocalDateTime.now());
+
+        Gym updated = gymRepository.save(gym);
+        return mapToResponse(updated);
+    }
+
+    @Transactional
+    public void deleteGym(UUID id) {
+        if (!gymRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Gym not found");
+        }
+        gymRepository.deleteById(id);
+    }
 
     private GymResponse mapToResponse(Gym gym) {
 

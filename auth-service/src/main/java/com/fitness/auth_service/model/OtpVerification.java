@@ -24,6 +24,9 @@ public class OtpVerification {
 
     private int attemptCount = 0;
 
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     private boolean isUsed = false;
 
     private LocalDateTime createdAt = LocalDateTime.now();
