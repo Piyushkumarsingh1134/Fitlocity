@@ -37,6 +37,7 @@ public class TestController {
         Map<String, String> response = new HashMap<>();
         response.put("status", "UP");
         response.put("service", "GymService");
+        response.put("version", "1.0.0");
         return ResponseEntity.ok(response);
     }
 

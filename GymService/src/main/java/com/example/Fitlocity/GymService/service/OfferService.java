@@ -41,8 +41,7 @@ public class OfferService {
     }
 
     public List<OfferResponse> getOffersByGymId(UUID gymId) {
-        return offerRepository.findAll().stream()
-                .filter(o -> o.getGym().getId().equals(gymId))
+        return offerRepository.findByGymId(gymId).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }

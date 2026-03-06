@@ -1,13 +1,26 @@
 package com.fitlocity.gym.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 @Data
 public class CreateEquipmentRequest {
+    @NotBlank(message = "Category is required")
     private String category;
+    
+    @NotBlank(message = "Equipment name is required")
     private String equipmentName;
+    
+    @NotBlank(message = "Brand is required")
     private String brand;
+    
     private String model;
+    
+    @NotNull(message = "Quantity is required")
+    @Positive(message = "Quantity must be positive")
     private Integer quantity;
+    
     private String condition;
 }

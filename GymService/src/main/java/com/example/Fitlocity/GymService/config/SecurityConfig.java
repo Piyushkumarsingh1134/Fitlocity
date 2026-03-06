@@ -1,4 +1,4 @@
-package com.fitlocity.gym.config;
+package com.example.Fitlocity.GymService.config;
 
 import com.fitlocity.gym.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;

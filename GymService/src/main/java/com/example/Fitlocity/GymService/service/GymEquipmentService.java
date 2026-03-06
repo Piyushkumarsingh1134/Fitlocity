@@ -42,8 +42,7 @@ public class GymEquipmentService {
     }
 
     public List<EquipmentResponse> getEquipmentByGymId(UUID gymId) {
-        return equipmentRepository.findAll().stream()
-                .filter(e -> e.getGym().getId().equals(gymId))
+        return equipmentRepository.findByGymId(gymId).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }

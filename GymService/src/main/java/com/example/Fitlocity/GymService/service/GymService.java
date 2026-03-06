@@ -3,6 +3,7 @@ package com.fitlocity.gym.service;
 import com.fitlocity.gym.domain.Gym;
 import com.fitlocity.gym.domain.GymOwner;
 import com.fitlocity.gym.dto.request.CreateGymRequest;
+import com.fitlocity.gym.dto.request.UpdateGymRequest;
 import com.fitlocity.gym.dto.response.GymResponse;
 import com.fitlocity.gym.exception.BadRequestException;
 import com.fitlocity.gym.exception.ResourceNotFoundException;
@@ -91,6 +92,34 @@ public class GymService {
                 .orElseThrow(() -> new ResourceNotFoundException("Gym not found"));
 
         return mapToResponse(gym);
+    }
+
+    @Transactional
+    public GymResponse updateGym(UUID id, UpdateGymRequest request) {
+        Gym gym = gymRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Gym not found"));
+
+        if (request.getName() != null) gym.setName(request.getName());
+        if (request.getDescription() != null) gym.setDescription(request.getDescription());
+        if (request.getAddress() != null) gym.setAddress(request.getAddress());
+        if (request.getGymType() != null) gym.setGymType(request.getGymType());
+        if (request.getContactPhone() != null) gym.setContactPhone(request.getContactPhone());
+        if (request.getContactEmail() != null) gym.setContactEmail(request.getContactEmail());
+        if (request.getTotalSqft() != null) gym.setTotalSqft(request.getTotalSqft());
+        if (request.getFloorsCount() != null) gym.setFloorsCount(request.getFloorsCount());
+
+        gym.setUpdatedAt(LocalDateTime.now());
+
+        Gym updated = gymRepository.save(gym);
+        return mapToResponse(updated);
+    }
+
+    @Transactional
+    public void deleteGym(UUID id) {
+        if (!gymRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Gym not found");
+        }
+        gymRepository.deleteById(id);
     }
 
     private GymResponse mapToResponse(Gym gym) {

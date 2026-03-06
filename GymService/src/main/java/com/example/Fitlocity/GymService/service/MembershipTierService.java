@@ -41,8 +41,7 @@ public class MembershipTierService {
     }
 
     public List<MembershipTierResponse> getTiersByGymId(UUID gymId) {
-        return tierRepository.findAll().stream()
-                .filter(t -> t.getGym().getId().equals(gymId))
+        return tierRepository.findByGymId(gymId).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }

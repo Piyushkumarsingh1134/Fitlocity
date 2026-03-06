@@ -3,6 +3,7 @@ package com.fitlocity.gym.controller;
 import com.fitlocity.gym.dto.request.CreateMembershipTierRequest;
 import com.fitlocity.gym.dto.response.MembershipTierResponse;
 import com.fitlocity.gym.service.MembershipTierService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class MembershipTierController {
     @PreAuthorize("hasRole('OWNER')")
     @PostMapping
     public MembershipTierResponse createTier(@PathVariable UUID gymId,
-                                             @RequestBody CreateMembershipTierRequest request) {
+                                             @Valid @RequestBody CreateMembershipTierRequest request) {
         return membershipTierService.createTier(gymId, request);
     }
 

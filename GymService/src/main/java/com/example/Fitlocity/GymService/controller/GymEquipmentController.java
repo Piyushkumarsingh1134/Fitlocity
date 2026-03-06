@@ -20,7 +20,7 @@ public class GymEquipmentController {
     @PreAuthorize("hasRole('OWNER')")
     @PostMapping
     public EquipmentResponse addEquipment(@PathVariable UUID gymId,
-                                          @RequestBody CreateEquipmentRequest request) {
+                                          @Valid @RequestBody CreateEquipmentRequest request) {
         return equipmentService.addEquipment(gymId, request);
     }
 
