@@ -68,7 +68,7 @@ public class User {
     @Column(name = "health_conditions", columnDefinition = "jsonb")
     private String healthConditions;
 
-    @Column(name = "is_verified", nullable = false)
+    @Column(name = "is_verified", nullable = true)
     @Builder.Default
     private Boolean isVerified = false;
 
