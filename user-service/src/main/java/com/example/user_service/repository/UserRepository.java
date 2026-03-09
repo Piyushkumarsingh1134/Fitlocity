@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,13 +18,15 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     Optional<User> findByPhone(String phone);
 
+    Optional<User> findById(UUID userId);
+
     Optional<User> findByReferralCode(String referralCode);
 
     boolean existsByEmail(String email);
 
     boolean existsByPhone(String phone);
 
-    List<User> findByReferredBy(UUID referredBy);
+    List<User> findByReferredBy(User referredBy);
 
     List<User> findByCityId(UUID cityId);
 
@@ -33,6 +36,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Query("SELECT u FROM User u WHERE u.experienceLevel = :level AND u.cityId = :cityId")
     List<User> findByExperienceLevelAndCity(@Param("level") String level, @Param("cityId") UUID cityId);
 
-    @Query("SELECT u FROM User u WHERE u.lastActive >= CURRENT_TIMESTAMP - 7 * 24 * 60 * 60")
-    List<User> findRecentlyActiveUsers();
+    @Query("SELECT u FROM User u WHERE u.lastActive >= :time")
+    List<User> findRecentlyActiveUsers(@Param("time") LocalDateTime time);
 }
