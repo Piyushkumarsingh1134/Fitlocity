@@ -4,12 +4,16 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
+import org.locationtech.jts.geom.Point;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -51,22 +55,26 @@ public class User {
     private UUID cityId;
 
     @Column(name = "home_location", columnDefinition = "geography(Point,4326)")
-    private String homeLocation;
+    private Point homeLocation;
 
     @Column(name = "work_location", columnDefinition = "geography(Point,4326)")
-    private String workLocation;
+    private Point workLocation;
 
+    
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "fitness_goals", columnDefinition = "jsonb")
-    private String fitnessGoals;
+    private List<String> fitnessGoals;
 
     @Column(name = "experience_level", length = 20)
     private String experienceLevel;
-
+    
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "dietary_preferences", columnDefinition = "jsonb")
-    private String dietaryPreferences;
+    private List<String> dietaryPreferences;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "health_conditions", columnDefinition = "jsonb")
-    private String healthConditions;
+    private List<String> healthConditions;
 
     @Column(name = "is_verified", nullable = true)
     @Builder.Default
