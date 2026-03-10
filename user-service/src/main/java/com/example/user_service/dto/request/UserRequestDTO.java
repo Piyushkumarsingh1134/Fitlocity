@@ -4,7 +4,10 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
+
+import com.example.user_service.dto.LocationDTO;
 
 @Getter
 @Setter
@@ -36,21 +39,21 @@ public class UserRequestDTO {
 
     private UUID cityId;
 
-    private String homeLocation;
+    private LocationDTO homeLocation;
 
-    private String workLocation;
+    private LocationDTO  workLocation;
 
     // JSON string representing fitness goals
-    private String fitnessGoals;
+    private List<String> fitnessGoals;
 
     @Size(max = 20)
     private String experienceLevel;
 
     // JSON string representing dietary preferences
-    private String dietaryPreferences;
+    private List<String> dietaryPreferences;
 
     // JSON string representing health conditions
-    private String healthConditions;
+    private List<String> healthConditions;
 
     private String referralCode;
 
