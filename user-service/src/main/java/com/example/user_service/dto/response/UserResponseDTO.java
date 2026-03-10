@@ -5,6 +5,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -34,13 +35,13 @@ public class UserResponseDTO {
 
     private String workLocation;
 
-    private String fitnessGoals;
+    private List<String> fitnessGoals;
 
     private String experienceLevel;
 
-    private String dietaryPreferences;
+    private List<String> dietaryPreferences;
 
-    private String healthConditions;
+    private List<String> healthConditions;
 
     private Boolean isVerified;
 
