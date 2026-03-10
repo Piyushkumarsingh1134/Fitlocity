@@ -19,8 +19,6 @@ public class UserMapper {
                 .dateOfBirth(dto.getDateOfBirth())
                 .gender(dto.getGender())
                 .cityId(dto.getCityId())
-                .homeLocation(dto.getHomeLocation())
-                .workLocation(dto.getWorkLocation())
                 .fitnessGoals(dto.getFitnessGoals())
                 .experienceLevel(dto.getExperienceLevel())
                 .dietaryPreferences(dto.getDietaryPreferences())
@@ -45,8 +43,6 @@ public class UserMapper {
         if (dto.getDateOfBirth() != null) user.setDateOfBirth(dto.getDateOfBirth());
         if (dto.getGender() != null) user.setGender(dto.getGender());
         if (dto.getCityId() != null) user.setCityId(dto.getCityId());
-        if (dto.getHomeLocation() != null) user.setHomeLocation(dto.getHomeLocation());
-        if (dto.getWorkLocation() != null) user.setWorkLocation(dto.getWorkLocation());
         if (dto.getFitnessGoals() != null) user.setFitnessGoals(dto.getFitnessGoals());
         if (dto.getExperienceLevel() != null) user.setExperienceLevel(dto.getExperienceLevel());
         if (dto.getDietaryPreferences() != null) user.setDietaryPreferences(dto.getDietaryPreferences());
@@ -68,8 +64,6 @@ public class UserMapper {
                 .dateOfBirth(user.getDateOfBirth())
                 .gender(user.getGender())
                 .cityId(user.getCityId())
-                .homeLocation(user.getHomeLocation())
-                .workLocation(user.getWorkLocation())
                 .fitnessGoals(user.getFitnessGoals())
                 .experienceLevel(user.getExperienceLevel())
                 .dietaryPreferences(user.getDietaryPreferences())

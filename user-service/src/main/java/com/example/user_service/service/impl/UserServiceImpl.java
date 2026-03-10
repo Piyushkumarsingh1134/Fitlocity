@@ -1,5 +1,8 @@
 package com.example.user_service.service.impl;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import com.example.user_service.dto.request.UserRequestDTO;
 import com.example.user_service.dto.response.UserResponseDTO;
 import com.example.user_service.mapper.UserMapper;
@@ -37,6 +40,7 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Phone already in use: " + dto.getPhone());
         }
 
+
         User user = userMapper.toEntity(dto);
 
         // Hash password if provided
@@ -44,6 +48,29 @@ public class UserServiceImpl implements UserService {
             user.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
         }
 
+        if(dto.getHomeLocation() != null) {
+
+            GeometryFactory geometryFactory = new GeometryFactory();
+
+            Point point = geometryFactory.createPoint(
+                    new Coordinate(dto.getHomeLocation().getLongitude(),
+                                dto.getHomeLocation().getLatitude())
+            );
+            point.setSRID(4326);
+            user.setHomeLocation(point);
+
+        }
+
+        if(dto.getWorkLocation() != null) {
+            GeometryFactory geometryFactory = new GeometryFactory();
+
+            Point point = geometryFactory.createPoint(
+                    new Coordinate(dto.getWorkLocation().getLongitude(),
+                                dto.getWorkLocation().getLatitude())
+            );
+            point.setSRID(4326);
+            user.setWorkLocation(point);
+        }
         // Resolve referredBy
         if (dto.getReferredById() != null) {
             User referrer = userRepository.findById(dto.getReferredById())
@@ -138,10 +165,6 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
-    // -------------------------------------------------------------------------
-    // UPDATE
-    // -------------------------------------------------------------------------
-
     @Override
     @Transactional
     public UserResponseDTO updateUser(UUID id, UserRequestDTO dto) {
@@ -199,10 +222,6 @@ public class UserServiceImpl implements UserService {
         user.setPremiumExpiry(base.plusDays(durationDays));
         return userMapper.toResponseDTO(userRepository.save(user));
     }
-
-    // -------------------------------------------------------------------------
-    // DELETE
-
 
     @Override
     @Transactional
