@@ -4,6 +4,7 @@ import com.fitlocity.gym.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -28,9 +29,15 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
+                        // Test endpoints
                         .requestMatchers("/api/test/**").permitAll()
-                        .requestMatchers("/api/gyms").permitAll()
-                        .requestMatchers("/api/gyms/**").permitAll()
+                        
+                        // Public GET endpoints
+                        .requestMatchers(HttpMethod.GET, "/api/gyms").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/gyms/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/owners/**").permitAll()
+                        
+                        // All other requests need authentication
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

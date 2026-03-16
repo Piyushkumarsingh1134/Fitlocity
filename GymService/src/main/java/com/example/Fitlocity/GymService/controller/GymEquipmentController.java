@@ -3,6 +3,7 @@ package com.fitlocity.gym.controller;
 import com.fitlocity.gym.dto.request.CreateEquipmentRequest;
 import com.fitlocity.gym.dto.response.EquipmentResponse;
 import com.fitlocity.gym.service.GymEquipmentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class GymEquipmentController {
     @PreAuthorize("hasRole('OWNER')")
     @PostMapping
     public EquipmentResponse addEquipment(@PathVariable UUID gymId,
-                                          @Valid @RequestBody CreateEquipmentRequest request) {
+                                          @RequestBody @Valid CreateEquipmentRequest request) {
         return equipmentService.addEquipment(gymId, request);
     }
 

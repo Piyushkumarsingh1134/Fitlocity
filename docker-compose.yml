@@ -4,11 +4,16 @@ services:
     image: postgres:16
     container_name: fitlocity-postgres
     environment:
-      POSTGRES_USER: ajaydangoriyatharu
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: fitlocity_gym
+      POSTGRES_USER: ${POSTGRES_USER:-ajaydangoriyatharu}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-fitlocity_gym}
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-ajaydangoriyatharu} -d fitlocity_gym"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - fitlocity-network
 
@@ -17,8 +22,15 @@ services:
     container_name: auth-service
     ports:
       - "4001:4001"
+    environment:
+      - JWT_SECRET=${JWT_SECRET:-this_is_a_very_long_secret_key_used_for_jwt_signing_which_must_be_at_least_256_bits_long}
+      - JWT_EXPIRY=${JWT_EXPIRY:-3600000}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-fitlocity_gym}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER:-ajaydangoriyatharu}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:-password}
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - fitlocity-network
 
@@ -27,8 +39,17 @@ services:
     container_name: gym-service
     ports:
       - "8082:8082"
+    environment:
+      - JWT_SECRET=${JWT_SECRET:-this_is_a_very_long_secret_key_used_for_jwt_signing_which_must_be_at_least_256_bits_long}
+      - JWT_EXPIRY=${JWT_EXPIRY:-3600000}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/${POSTGRES_DB:-fitlocity_gym}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER:-ajaydangoriyatharu}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD:-password}
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
     networks:
       - fitlocity-network
 
