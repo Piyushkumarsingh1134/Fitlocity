@@ -53,6 +53,23 @@ services:
     networks:
       - fitlocity-network
 
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - AUTH_SERVICE_URL=http://auth-service:4001
+      - GYM_SERVICE_URL=http://gym-service:8082
+      - USER_SERVICE_URL=http://user-service:8082
+    depends_on:
+      auth-service:
+        condition: service_started
+      gym-service:
+        condition: service_started
+    networks:
+      - fitlocity-network
+
 networks:
   fitlocity-network:
     driver: bridge
